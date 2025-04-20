@@ -255,6 +255,14 @@
       if (isFs) { toggleBtn.style.display = 'none'; panel.classList.remove('open'); }
       else { toggleBtn.style.display = 'block'; toggleBtn.style.opacity = '1'; toggleBtn.style.pointerEvents = 'auto'; }
     });
+    
+    // Reset theme modes
+    const resetBtn = document.getElementById('reset-theme-btn');
+    resetBtn.addEventListener('click', () => {
+      // Clear theme classes
+      document.body.classList.remove('white-mode', 'romantic-mode');
+      // Keep settings panel open and toggle button state unchanged
+    });
   </script>
 </body>
 </html>
