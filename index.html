@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-LT5LYM5265"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}  
     gtag('js', new Date());
-
     gtag('config', 'G-LT5LYM5265');
   </script>
-  <meta charset="UTF-8">
   <title>メランコリック・ノイズ・ニキシー時計</title>
   <link href="https://fonts.googleapis.com/css2?family=Nixie+One&display=swap" rel="stylesheet">
   <style>
@@ -26,6 +27,10 @@
       font-family: 'Nixie One', monospace;
       overflow: hidden;
       position: relative;
+      touch-action: manipulation;
+    }
+    button, input[type=checkbox], input[type=range] {
+      touch-action: manipulation;
     }
     body.white-mode { background: #fff; }
     body.romantic-mode { background: #fff; }
@@ -40,7 +45,7 @@
     #clock {
       position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      display: flex; gap: 0.5vw;
+      display: flex; gap: 0.5rem;
       z-index: 2;
     }
     .digit {
@@ -67,32 +72,31 @@
     }
     #settings-toggle {
       position: absolute; top: 1rem; left: 1rem;
-      background: transparent; border: none;
-      color: #ff7a00; font-size: 1.8rem;
+      background: rgba(0,0,0,0.5); border: none;
+      color: #ff7a00; font-size: 2rem;
+      padding: 0.5rem; border-radius: 50%;
       z-index: 5; cursor: pointer;
       transition: opacity .3s;
     }
     #settings-panel {
-      display: flex;
-      flex-direction: column;
-      padding: 1rem;
+      display: flex; flex-direction: column;
+      padding: 1.5rem;
       gap: 1.5rem;
-    
       position: absolute; top: 0; left: 0;
-      width: 280px; height: 100%;
+      width: 280px; max-width: 80%; height: 100%;
       background: rgba(17,17,17,0.98);
       color: #ccc;
       box-shadow: 4px 0 12px rgba(0,0,0,0.8);
       transform: translateX(-100%);
       transition: transform .3s;
-      z-index: 4; padding: 1rem;
+      z-index: 4;
       box-sizing: border-box;
-      padding-bottom: 2rem;
+      padding-bottom: 3rem;
       overflow-y: auto;
     }
     #settings-panel.open { transform: translateX(0); }
     .group-title {
-      margin: 1rem 0 .5rem;
+      margin: 1rem 0 .3rem;
       font-size: 1rem; font-weight: 600;
       color: #888; border-bottom: 1px solid #333;
       padding-bottom: .3rem;
@@ -110,27 +114,45 @@
       width: 100%;
       -webkit-appearance: none;
       background: #333;
-      height: 4px;
-      border-radius: 2px;
+      height: 6px;
+      border-radius: 3px;
     }
     .setting-item input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 12px; height: 12px;
+      width: 16px; height: 16px;
       border-radius: 50%; background: #ff7a00;
     }
     .setting-item input[type=checkbox] {
-      width: 1rem; height: 1rem;
+      width: 1.2rem; height: 1.2rem;
     }
-    #fullscreen-toggle, #theme-toggle-btn, #romantic-toggle-btn {
+    #fullscreen-toggle,
+    #theme-toggle-btn,
+    #romantic-toggle-btn,
+    #reset-theme-btn {
       background: #ff7a00;
       color: #000;
       border: none;
-      padding: .6rem 1rem;
+      padding: .8rem 1.2rem;
       border-radius: 4px;
       font-weight: bold;
-      width: auto;
       cursor: pointer;
       justify-self: end;
+    }
+    @media (max-width: 600px) {
+      :root { --digit-size: 18vw; }
+      #settings-panel { width: 90%; padding: 1rem; }
+      #settings-toggle { font-size: 2.5rem; padding: 0.6rem; }
+      .setting-item { font-size: 1rem; gap: 1rem; margin: 1.2rem 0; }
+      .setting-item input[type=range] { height: 8px; }
+      #fullscreen-toggle,
+      #theme-toggle-btn,
+      #romantic-toggle-btn,
+      #reset-theme-btn { padding: 1rem; font-size: 1rem; }
+    }
+    @media (orientation: landscape) {
+      :root { --digit-size: 10vw; }
+      #settings-panel { width: 50%; max-width: 280px; }
+      #clock { gap: 1vw; }
     }
     svg { position: absolute; width: 0; height: 0; overflow: hidden; }
   </style>
@@ -163,11 +185,11 @@
   <div id="settings-panel">
     <h2>設定</h2>
     <div class="group-title">テーマ</div>
-    <div class="setting-item" data-mode="white">
+    <div class="setting-item">
       <label>ホワイト</label>
       <button id="theme-toggle-btn">切替</button>
     </div>
-    <div class="setting-item" data-mode="romantic">
+    <div class="setting-item">
       <label>ロマンチック</label>
       <button id="romantic-toggle-btn">切替</button>
     </div>
@@ -195,15 +217,6 @@
     <button id="fullscreen-toggle">フルスクリーン切替</button>
   </div>
   <script>
-    // Update theme UI visibility based on current mode
-    function updateThemeUI() {
-      const whiteItem = document.querySelector('.setting-item[data-mode="white"]');
-      const romanticItem = document.querySelector('.setting-item[data-mode="romantic"]');
-      const isWhite = document.body.classList.contains('white-mode');
-      const isRomantic = document.body.classList.contains('romantic-mode');
-      whiteItem.style.display = isWhite ? 'grid' : 'none';
-      romanticItem.style.display = isRomantic ? 'grid' : 'none';
-    }
     const noiseCanvas = document.getElementById('noise');
     const ctx = noiseCanvas.getContext('2d');
     const panel = document.getElementById('settings-panel');
@@ -258,29 +271,35 @@
       }
     });
     themeBtn.addEventListener('click', () => {
-      const isWhite = document.body.classList.toggle('white-mode');
-      if (isWhite) document.body.classList.remove('romantic-mode');
+      document.body.classList.toggle('white-mode');
     });
     romanticBtn.addEventListener('click', () => {
-      const isRomantic = document.body.classList.toggle('romantic-mode');
-      if (isRomantic) document.body.classList.remove('white-mode');
+      document.body.classList.toggle('romantic-mode');
     });
     opacityRange.addEventListener('input', e => noiseCanvas.style.opacity = e.target.value);
     sizeRange.addEventListener('input', e => document.documentElement.style.setProperty('--digit-size', e.target.value + 'vw'));
-    fsBtn.addEventListener('click', () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); });
-    document.addEventListener('fullscreenchange', () => {
-      const isFs = !!document.fullscreenElement;
+    fsBtn.addEventListener('click', () => {
+      const docEl = document.documentElement;
+      const isFs = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!isFs) {
+        if (docEl.requestFullscreen) docEl.requestFullscreen();
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      }
+    });
+    function onFullChange() {
+      const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
       if (isFs) { toggleBtn.style.display = 'none'; panel.classList.remove('open'); }
       else { toggleBtn.style.display = 'block'; toggleBtn.style.opacity = '1'; toggleBtn.style.pointerEvents = 'auto'; }
-    });
-    
+    }
+    document.addEventListener('fullscreenchange', onFullChange);
+    document.addEventListener('webkitfullscreenchange', onFullChange);
     // Reset theme modes
     const resetBtn = document.getElementById('reset-theme-btn');
     resetBtn.addEventListener('click', () => {
-      // Clear theme classes
       document.body.classList.remove('white-mode', 'romantic-mode');
-      // Update theme UI to show both options
-      updateThemeUI();
     });
   </script>
 </body>
