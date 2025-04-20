@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LT5LYM5265"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}  
+    gtag('js', new Date());
+
+    gtag('config', 'G-LT5LYM5265');
+  </script>
   <meta charset="UTF-8">
   <title>メランコリック・ノイズ・ニキシー時計</title>
   <link href="https://fonts.googleapis.com/css2?family=Nixie+One&display=swap" rel="stylesheet">
@@ -186,6 +195,15 @@
     <button id="fullscreen-toggle">フルスクリーン切替</button>
   </div>
   <script>
+    // Update theme UI visibility based on current mode
+    function updateThemeUI() {
+      const whiteItem = document.querySelector('.setting-item[data-mode="white"]');
+      const romanticItem = document.querySelector('.setting-item[data-mode="romantic"]');
+      const isWhite = document.body.classList.contains('white-mode');
+      const isRomantic = document.body.classList.contains('romantic-mode');
+      whiteItem.style.display = isWhite ? 'grid' : 'none';
+      romanticItem.style.display = isRomantic ? 'grid' : 'none';
+    }
     const noiseCanvas = document.getElementById('noise');
     const ctx = noiseCanvas.getContext('2d');
     const panel = document.getElementById('settings-panel');
@@ -261,7 +279,8 @@
     resetBtn.addEventListener('click', () => {
       // Clear theme classes
       document.body.classList.remove('white-mode', 'romantic-mode');
-      // Keep settings panel open and toggle button state unchanged
+      // Update theme UI to show both options
+      updateThemeUI();
     });
   </script>
 </body>
